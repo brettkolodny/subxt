@@ -562,6 +562,16 @@ impl<T: Config> Rpc<T> {
         Ok(xt_hash)
     }
 
+    /// Submit an extrinsic from the extrinsic's bytes and return the corresponding Hash if successful
+    pub async fn submit_extrinsic_bytes(&self, extrinsic: Bytes) -> Result<T::Hash, BasicError> {
+        let params = &[to_json_value(extrinsic)?];
+        let xt_hash = self
+            .client
+            .request("author_submitExtrinsic", params)
+            .await?;
+        Ok(xt_hash)
+    }
+
     /// Create and submit an extrinsic and return a subscription to the events triggered.
     pub async fn watch_extrinsic<X: Encode>(
         &self,
