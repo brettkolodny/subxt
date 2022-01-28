@@ -186,6 +186,11 @@ impl<T: Config> Client<T> {
     pub fn events_decoder(&self) -> &EventsDecoder<T> {
         &self.events_decoder
     }
+
+    /// docs
+    pub async fn submit_bytes(self, bytes: Bytes) -> Result<T::Hash, BasicError> {
+        self.rpc.submit_extrinsic_bytes(bytes).await
+    }
 }
 
 /// A constructed call ready to be signed and submitted.
@@ -234,15 +239,6 @@ where
         let sub = self.client.rpc().watch_extrinsic(extrinsic).await?;
 
         Ok(TransactionProgress::new(sub, self.client, ext_hash))
-    }
-
-    /// docs
-    pub async fn submit_bytes(self, bytes: Bytes) -> Result<T::Hash, BasicError>
-    where
-        <<X as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned:
-            Send + Sync + 'static,
-    {
-        self.client.rpc().submit_extrinsic_bytes(bytes).await
     }
 
     /// Creates and signs an extrinsic and submits to the chain for block inclusion.
