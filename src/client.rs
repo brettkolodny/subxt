@@ -18,6 +18,8 @@ use futures::future;
 use sp_runtime::traits::Hash;
 pub use sp_runtime::traits::SignedExtension;
 
+use sp_core::Bytes;
+
 use crate::{
     error::BasicError,
     events::EventsDecoder,
@@ -232,6 +234,15 @@ where
         let sub = self.client.rpc().watch_extrinsic(extrinsic).await?;
 
         Ok(TransactionProgress::new(sub, self.client, ext_hash))
+    }
+
+    /// docs
+    pub async fn submit_bytes(self, bytes: Bytes) -> Result<T::Hash, BasicError>
+    where
+        <<X as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned:
+            Send + Sync + 'static,
+    {
+        self.client.rpc().submit_extrinsic_bytes(bytes).await
     }
 
     /// Creates and signs an extrinsic and submits to the chain for block inclusion.
